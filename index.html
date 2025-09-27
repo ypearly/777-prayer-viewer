@@ -112,9 +112,9 @@
                 </div>
             </main>
 
-            <!-- 푸터 (선택 사항) -->
+            <!-- 푸터 (수정된 부분) -->
             <footer class="text-center mt-12 text-gray-400 text-sm">
-                &copy; 2024. 콘텐츠 뷰어 예제
+                Made by YKM with Gemini - 777기도
             </footer>
         </div>
     </div>
@@ -167,11 +167,11 @@
             },
             {
                 title: "7여정(1): 성삼위 하나님의 인도",
-                content: "성삼위 하나님께서 성령으로 인도하십니다. 말씀에 순종할 때 성령의 인도를 확실히 받게 하옵소서."
+                content: "<strong>여정</strong>\n하나님의 계획을 어디서든 발견하여 7여정이 뿌리내리게 하소서.\n\n<strong>성삼위 하나님의 인도</strong>\n내 안에 영으로 임하셔서 성삼위 하나님이 인도하시는 길로 가게 하옵소서.\n\n우리의 여정이 성부 하나님의 말씀 성취와 그리스도의 구원의 역사와 성령의 능력 속에 있게 하옵소서. 성삼위 하나님의 시간표 속에 있게 하셔서 영세 전에 감추어 둔 것과 지금 아니면 안되는 것과 영원히 있을 것에 쓰임 받게 하옵소서."
             },
             {
                 title: "7여정(2): 10가지 비밀",
-                content: "10가지 비밀(독립, 초월, 영적사실, 시너지, 위기, 무경쟁, 재창조, 서밋, 말씀성취, 절정)을 통해 세상을 이길 힘을 얻게 하옵소서."
+                content: "<strong>10가지 비밀</strong>\n나에게는 어려움이 너무 많습니다. 하나님이 준비해 놓은 그 길 찾기 위해 10가지 비밀 누리게 하옵소서. 그래서 무엇이든지 응답으로 바꾸는 여정을 가게 하옵소서.\n\n<strong>영적 독립</strong>\n기도로 성삼위 하나님과 보좌의 능력과 세계 살릴 힘을 얻게 하셔서 어떤 경우에도 혼자 살아남는 길을 가게 하옵소서.\n\n<strong>영적 사실</strong>\n세상 나라, 사탄의 나라, 하나님 나라를 알고 현실과 사실과 진실 속에서 다른 사람이 못 보는 영적 사실을 보게 하옵소서.\n\n<strong>반대편</strong>\n사람이 생각지도 않은 반대편에 하나님의 숨은 응답이 있음을 알고 나의 기준, 수준, 표준을 넘어 하나님의 것에 집중하게 하옵소서.\n\n<strong>시너지</strong>\nWith, Immanuel, Oneness를 가지고 가는 곳마다 많은 사람을 살리는 시너지가 일어나게 하옵소서.\n\n<strong>위기</strong>\n성삼위 하나님의 능력 아는 자는 위기 속으로 들어갑니다. 보조화 된 사람은 위기 속에 있는 축복을 봅니다. 성령 충만한 사람은 위기 속에서 사람 살리는 길을 찾습니다. 위기 속에 들어가서 하나님의 절대 계획을 찾아내 이기게 하옵소서.\n\n<strong>무경쟁</strong>\n하나님의 자녀 된 신분과 권세와 그 배경으로 영적인 힘과 참 응답을 받아 싸우지 않고 이기는 길을 가게 하옵소서.\n\n<strong>재창조</strong>\n어딜 가든지 숨겨져 있는 오직, 유일성, 재창조를 찾아내어 가장 필요한 것을 하는 사람으로 서게 하옵소서.\n\n<strong>서밋</strong>\n영적 서밋, 기능 서밋, 문화 서밋의 자리에 올라 환경과 현장을 살리고, 시대를 앞서가는 응답을 받게 하옵소서.\n\n<strong>Nobody, Nothing</strong>\n아무도 도와주지 않는 Nobody에서 모든 사람 살리는 Everybody로, 아무것도 없는 Nothing에서 모든 것을 살리는 Everything으로 가는 나의 길 되게 하옵서서.\n\n<strong>절대 응답</strong>\n어디서든지 절대 계획과 절대 이유를 찾아내어 절대 응답을 누리는 성공자가 되게 하옵소서."
             },
             {
                 title: "7여정(3): 10가지 발판",
@@ -241,6 +241,7 @@
             const { onSnapshot } = window.firebaseImports;
             const loadingMessage = document.getElementById('loading-message');
             loadingMessage.textContent = '체크 상태 로드 중...';
+            loadingMessage.classList.remove('hidden'); // 로딩 메시지 다시 표시
 
             // 실시간 리스너 설정
             onSnapshot(getPrayerDocRef(appId, userId), (docSnapshot) => {
@@ -258,6 +259,8 @@
             }, (error) => {
                 console.error("Firestore snapshot listener error:", error);
                 loadingMessage.textContent = '데이터 로드 오류.';
+                // 오류 발생 시에도 최소한 목록은 렌더링하여 '데이터 로드 중...' 메시지를 제거
+                renderTopicList(); 
             });
         }
 
@@ -409,7 +412,10 @@
                     userId = auth.currentUser?.uid;
                     userIdDisplay.textContent = `사용자 ID: ${userId || 'N/A'}`;
                     
-                    // 2. 인증 성공 후 데이터 로드 시작
+                    // FIX: 목록을 즉시 렌더링하여 '데이터 로드 중...' 메시지를 제거하고 기본 목록을 표시합니다.
+                    renderTopicList(); 
+
+                    // 2. 인증 성공 후 데이터 로드 시작 (checkedStatus는 onSnapshot이 채워줌)
                     loadCheckStatus();
 
                 } catch (error) {
