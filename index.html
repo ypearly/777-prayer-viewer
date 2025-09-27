@@ -233,32 +233,44 @@
 
         /**
          * 특정 주제를 선택하고 콘텐츠 영역을 업데이트하며, 체크 상태를 토글합니다.
+         * 체크 해제 시에는 내용을 숨기는 대신, 마지막으로 표시된 내용을 유지합니다.
          * @param {number} index - 선택된 주제의 인덱스
          */
         function selectTopic(index) {
             if (index < 0 || index >= topics.length) return;
 
             const topic = topics[index];
-            // \n (실제 줄바꿈 문자)을 HTML 줄 바꿈(<br>)으로 변환하여 콘텐츠 영역에 표시
-            const formattedContent = topic.content.replace(/\n/g, '<br>');
-
-            // 1. 콘텐츠 영역 업데이트
             const contentDisplay = document.getElementById('content-display');
-            contentDisplay.innerHTML = `
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3" id="content-title">
-                    ${topic.title}
-                </h2>
-                <div class="text-gray-700 leading-relaxed text-lg bg-secondary-gray p-6 rounded-xl shadow-inner">
-                    <p class="mb-4 font-semibold text-primary-blue">기도 내용:</p>
-                    <p>${formattedContent}</p>
-                </div>
-            `;
 
-            // 2. 체크 상태 토글 (인메모리에서만)
-            checkedStatus[index] = !(checkedStatus[index] === true);
+            // 1. 다음 상태 결정: 현재 체크 상태의 반대가 다음 상태가 됨
+            const wasChecked = checkedStatus[index] === true;
+            const willBeChecked = !wasChecked; // true -> false, false -> true
+
+            // 2. 체크 상태 토글
+            checkedStatus[index] = willBeChecked;
             
-            // 3. UI 업데이트
-            renderTopicList(); 
+            // 3. UI 업데이트 (버튼 색상/아이콘)
+            renderTopicList();
+
+            // 4. 콘텐츠 표시 조건: willBeChecked가 true일 때만 콘텐츠를 업데이트합니다.
+            //    체크를 해제(willBeChecked: false)하는 경우, 콘텐츠는 이전 상태 그대로 유지됩니다.
+            if (willBeChecked) {
+                // 체크하는 경우: 새로운 콘텐츠 표시
+                // \n (실제 줄바꿈 문자)을 HTML 줄 바꿈(<br>)으로 변환하여 콘텐츠 영역에 표시
+                const formattedContent = topic.content.replace(/\n/g, '<br>');
+
+                contentDisplay.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3" id="content-title">
+                        ${topic.title}
+                    </h2>
+                    <div class="text-gray-700 leading-relaxed text-lg bg-secondary-gray p-6 rounded-xl shadow-inner">
+                        <p class="mb-4 font-semibold text-primary-blue">기도 내용:</p>
+                        <p>${formattedContent}</p>
+                    </div>
+                `;
+            } 
+            // else (willBeChecked가 false인 경우 - 체크 해제): 
+            // contentDisplay.innerHTML을 변경하지 않으므로, 마지막에 표시된 내용이 유지됩니다.
         }
 
         /**
